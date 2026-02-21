@@ -1,0 +1,5 @@
+{
+  "name": "AI Resume Transformer",
+  "description": "Convert any resume into ATS-friendly LaTeX format using AI-powered optimization.",
+  "requestFramePermissions": []
+}
