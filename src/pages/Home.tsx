@@ -31,11 +31,20 @@ export const Home: React.FC = () => {
       margin: 0.5,
       filename: `${resumeData?.name.replace(/\s+/g, '_')}_Resume.pdf`,
       image: { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true, 
+        backgroundColor: '#ffffff',
+        logging: false,
+        letterRendering: true
+      },
       jsPDF: { unit: 'in', format: 'letter' as const, orientation: 'portrait' as const }
     };
 
-    html2pdf().set(opt).from(element).save();
+    // Add a small delay to ensure all styles and icons are fully loaded
+    setTimeout(() => {
+      html2pdf().set(opt).from(element).save();
+    }, 500);
   };
 
   useEffect(() => {
