@@ -31,7 +31,7 @@ export function generateLatex(data: ResumeData): string {
 
   const projectItems = data.projects.map(proj => `
 \\resumeProjectHeading
-  {\\textbf{${escapeLatex(proj.name)}} $|$ \\emph{${escapeLatex(proj.technologies.join(', '))}}}{}
+  {\\textbf{${escapeLatex(proj.name)}} $|$ \\emph{${escapeLatex(proj.technologies.join(', '))}}}{${proj.link ? `\\href{${proj.link}}{\\underline{Link}}` : ''}}
   \\resumeItemListStart
     ${proj.highlights.map(h => `\\resumeItem{${escapeLatex(h)}}`).join('\n    ')}
   \\resumeItemListEnd`).join('\n');
@@ -39,7 +39,27 @@ export function generateLatex(data: ResumeData): string {
   const educationItems = data.education.map(edu => `
 \\resumeSubheading
   {${escapeLatex(edu.institution)}}{${escapeLatex(edu.location)}}
-  {${escapeLatex(edu.degree)}}{${escapeLatex(edu.graduationDate)}}`).join('\n');
+  {${escapeLatex(edu.degree)}${edu.gpa ? `, GPA: ${escapeLatex(edu.gpa)}` : ''}}{${escapeLatex(edu.graduationDate)}}`).join('\n');
+
+  const achievementsSection = data.achievements?.length
+    ? `
+\\section{Achievements}
+  \\resumeSubHeadingListStart
+    \\resumeItemListStart
+      ${data.achievements.map(a => `\\resumeItem{${escapeLatex(a)}}`).join('\n      ')}
+    \\resumeItemListEnd
+  \\resumeSubHeadingListEnd
+` : '';
+
+  const certificationsSection = data.certifications?.length
+    ? `
+\\section{Certifications}
+  \\resumeSubHeadingListStart
+    \\resumeItemListStart
+      ${data.certifications.map(c => `\\resumeItem{${escapeLatex(c)}}`).join('\n      ')}
+    \\resumeItemListEnd
+  \\resumeSubHeadingListEnd
+` : '';
 
   return `\\documentclass[letterpaper,11pt]{article}
 
@@ -114,9 +134,7 @@ export function generateLatex(data: ResumeData): string {
 
 \\begin{center}
     \\textbf{\\Huge \\scshape ${escapeLatex(data.name)}} \\\\ \\vspace{1pt}
-    \\small ${escapeLatex(data.phone)} $|$ \\href{mailto:${data.email}}{\\underline{${escapeLatex(data.email)}}} $|$ 
-    \\href{${data.linkedin}}{\\underline{linkedin.com/in/${escapeLatex(data.linkedin?.split('/').pop())}}} $|$
-    \\href{${data.github}}{\\underline{github.com/${escapeLatex(data.github?.split('/').pop())}}}
+    \\small ${escapeLatex(data.phone)} $|$ \\href{mailto:${data.email}}{\\underline{${escapeLatex(data.email)}}}${data.linkedin ? ` $|$ \\href{${data.linkedin}}{\\underline{linkedin.com/in/${escapeLatex(data.linkedin?.split('/').pop())}}}` : ''}${data.github ? ` $|$ \\href{${data.github}}{\\underline{github.com/${escapeLatex(data.github?.split('/').pop())}}}` : ''}${data.portfolio ? ` $|$ \\href{${data.portfolio}}{\\underline{Portfolio}}` : ''}
 \\end{center}
 
 \\section{Education}
@@ -140,7 +158,7 @@ export function generateLatex(data: ResumeData): string {
     \\resumeSubHeadingListStart
       ${projectItems}
     \\resumeSubHeadingListEnd
-
+${achievementsSection}${certificationsSection}
 \\end{document}
 `;
 }

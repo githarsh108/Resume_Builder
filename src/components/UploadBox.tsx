@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Upload, FileText, X, Loader2 } from 'lucide-react';
+import { Upload, FileText, X, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -10,12 +10,15 @@ function cn(...inputs: ClassValue[]) {
 
 interface UploadBoxProps {
   onFileSelect: (file: File) => void;
+  onJobDescriptionChange: (jd: string) => void;
   isProcessing: boolean;
 }
 
-export const UploadBox: React.FC<UploadBoxProps> = ({ onFileSelect, isProcessing }) => {
+export const UploadBox: React.FC<UploadBoxProps> = ({ onFileSelect, onJobDescriptionChange, isProcessing }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showJD, setShowJD] = useState(false);
+  const [jdText, setJdText] = useState('');
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -45,8 +48,13 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ onFileSelect, isProcessing
     }
   }, [onFileSelect]);
 
+  const handleJdChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setJdText(e.target.value);
+    onJobDescriptionChange(e.target.value);
+  };
+
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto space-y-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -122,6 +130,68 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ onFileSelect, isProcessing
           )}
         </AnimatePresence>
       </motion.div>
+
+      {/* Job Description Accordion */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="rounded-2xl border border-white/[0.05] bg-zinc-900/20 overflow-hidden"
+      >
+        <button
+          onClick={() => setShowJD(v => !v)}
+          className="w-full flex items-center justify-between px-5 py-3 text-left"
+          disabled={isProcessing}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">
+              Paste Job Description
+            </span>
+            <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-bold uppercase tracking-wider">
+              Optional
+            </span>
+          </div>
+          {showJD ? (
+            <ChevronUp className="w-3.5 h-3.5 text-zinc-500" />
+          ) : (
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
+          )}
+        </button>
+        <AnimatePresence>
+          {showJD && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="px-5 pb-4 space-y-2">
+                <p className="text-[10px] text-zinc-600 leading-relaxed">
+                  Paste the job description here and the AI will tailor your resume's language and keywords to match it.
+                </p>
+                <textarea
+                  value={jdText}
+                  onChange={handleJdChange}
+                  placeholder="e.g. 'We're looking for a software engineer with 3+ years of experience in React, Node.js and cloud infrastructure...'"
+                  rows={5}
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-300 placeholder:text-zinc-600 resize-none focus:outline-none focus:border-emerald-500/50 transition-colors font-mono leading-relaxed"
+                />
+                {jdText.trim() && (
+                  <p className="text-[10px] text-emerald-500/70 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Job description will be used to tailor your resume
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Privacy notice */}
+      <p className="text-center text-[10px] text-zinc-700 leading-relaxed">
+        🔒 Your resume is processed and all your data stays only in your browser only
+      </p>
     </div>
   );
 };

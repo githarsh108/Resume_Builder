@@ -1,12 +1,14 @@
 import React from 'react';
-import { Download, Copy, Check, FileCode } from 'lucide-react';
+import { Download, Copy, Check, FileCode, FileType } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface LatexEditorProps {
   latex: string;
+  onLatexChange: (newLatex: string) => void;
+  onExportWord: () => void;
 }
 
-export const LatexEditor: React.FC<LatexEditorProps> = ({ latex }) => {
+export const LatexEditor: React.FC<LatexEditorProps> = ({ latex, onLatexChange, onExportWord }) => {
   const [copied, setCopied] = React.useState(false);
 
   const handleCopy = () => {
@@ -33,12 +35,21 @@ export const LatexEditor: React.FC<LatexEditorProps> = ({ latex }) => {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-4xl mx-auto space-y-4"
     >
-      <div className="flex items-center justify-between px-4">
+      <div className="flex items-center justify-between px-4 flex-wrap gap-2">
         <div className="flex items-center gap-2 text-zinc-400">
           <FileCode className="w-4 h-4" />
           <span className="text-xs font-mono uppercase tracking-widest">Generated LaTeX</span>
+          <span className="text-[9px] text-zinc-600 font-mono">(editable)</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={onExportWord}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-600/20 border border-blue-600/30 hover:bg-blue-600/30 text-blue-400 text-sm transition-colors"
+            title="Export as Word document (.docx)"
+          >
+            <FileType className="w-4 h-4" />
+            Export Word
+          </button>
           <button
             onClick={handleCopy}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition-colors"
@@ -57,10 +68,13 @@ export const LatexEditor: React.FC<LatexEditorProps> = ({ latex }) => {
       </div>
 
       <div className="relative rounded-2xl border border-zinc-800 bg-zinc-900/50 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-zinc-900/50 pointer-events-none" />
-        <pre className="p-6 overflow-auto max-h-[600px] text-sm font-mono text-zinc-400 leading-relaxed scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-          <code>{latex}</code>
-        </pre>
+        <textarea
+          value={latex}
+          onChange={(e) => onLatexChange(e.target.value)}
+          spellCheck={false}
+          className="w-full h-[600px] p-6 text-sm font-mono text-zinc-400 leading-relaxed bg-transparent resize-none focus:outline-none scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent"
+          aria-label="LaTeX source code editor"
+        />
       </div>
     </motion.div>
   );

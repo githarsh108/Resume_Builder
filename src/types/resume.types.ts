@@ -45,6 +45,26 @@ export interface ResumeData {
   projects: ResumeProject[];
   education: ResumeEducation[];
   achievements: string[];
+  certifications?: string[];
 }
 
 export type ResumeStatus = 'idle' | 'parsing' | 'transforming' | 'completed' | 'error';
+
+export interface ResumeVersion {
+  id: string;
+  filename: string;
+  timestamp: string;
+  data: ResumeData;
+  latex: string;
+}
+
+export interface AtsCheckItem {
+  label: string;
+  passed: boolean;
+  tip: string;
+}
+
+export interface AtsReport {
+  score: number;
+  checks: AtsCheckItem[];
+}

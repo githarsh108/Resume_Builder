@@ -1,13 +1,17 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ResumeData } from "../types/resume.types";
 
-export async function transformResumeWithAI(text: string): Promise<ResumeData> {
+export async function transformResumeWithAI(text: string, jobDescription?: string): Promise<ResumeData> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-  
+
+  const jobSection = jobDescription?.trim()
+    ? `\n    JOB DESCRIPTION TO TARGET:\n    ${jobDescription.trim()}\n\n    TAILORING INSTRUCTIONS:\n    - Tailor the resume specifically for this job description.\n    - Rewrite experience and project bullets to mirror the job's language and keywords.\n    - Emphasize skills and tools mentioned in the job description.\n    - Do NOT fabricate experience — only reframe existing content.\n`
+    : '';
+
   const prompt = `
     You are an expert resume writer and ATS (Applicant Tracking System) specialist.
     Your task is to take the following raw resume text and transform it into a highly structured, professional, and ATS-friendly JSON format.
-    
+    ${jobSection}
     GUIDELINES:
     1. Extract contact info accurately.
     2. Rewrite experience bullet points to be quantified and impact-based (e.g., "Increased efficiency by 20% using X").
@@ -16,6 +20,7 @@ export async function transformResumeWithAI(text: string): Promise<ResumeData> {
     5. Remove any generic summary or objective sections.
     6. Focus on measurable achievements.
     7. If information is missing, use reasonable defaults or leave empty strings/arrays, do not hallucinate facts.
+    8. Extract any certifications, awards, or notable achievements into the achievements and certifications arrays.
     
     RAW RESUME TEXT:
     ${text}
@@ -27,7 +32,7 @@ export async function transformResumeWithAI(text: string): Promise<ResumeData> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash-preview-04-17",
         contents: [{ parts: [{ text: prompt }] }],
         config: {
           responseMimeType: "application/json",
@@ -90,8 +95,9 @@ export async function transformResumeWithAI(text: string): Promise<ResumeData> {
                 }
               },
               achievements: { type: Type.ARRAY, items: { type: Type.STRING } },
+              certifications: { type: Type.ARRAY, items: { type: Type.STRING } },
             },
-            required: ["name", "email", "phone", "skills", "experience", "projects", "education", "achievements"]
+            required: ["name", "email", "phone", "skills", "experience", "projects", "education", "achievements", "certifications"]
           }
         }
       });
@@ -100,14 +106,14 @@ export async function transformResumeWithAI(text: string): Promise<ResumeData> {
     } catch (e: any) {
       lastError = e;
       const isRetryable = e?.status === 'UNAVAILABLE' || e?.code === 503 || e?.message?.includes('demand');
-      
+
       if (isRetryable && attempt < maxRetries) {
         const delay = Math.pow(2, attempt) * 1000;
         console.warn(`AI model busy, retrying in ${delay}ms... (Attempt ${attempt + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
-      
+
       console.error("AI Transformation failed:", e);
       break;
     }
