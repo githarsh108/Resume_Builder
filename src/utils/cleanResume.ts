@@ -38,7 +38,7 @@ export async function transformResumeWithAI(text: string, jobDescription?: strin
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash",
         contents: [{ parts: [{ text: prompt }] }],
         config: {
           responseMimeType: "application/json",
