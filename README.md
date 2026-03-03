@@ -1,20 +1,123 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 📄 Resume Builder
 
-# Run and deploy your AI Studio app
+A powerful resume transformation tool that helps convert unstructured or poorly formatted resumes into **clean, professional, ATS-friendly resumes** in just a few clicks.
 
-This contains everything you need to run your app locally.
+This project is designed to help job seekers improve their resume quality and increase their chances of passing Applicant Tracking Systems (ATS) used by recruiters.
 
-View your app in AI Studio: https://ai.studio/apps/e5908e40-7460-433f-9e08-889003e20f4f
+---
 
-## Run Locally
+## 🌟 Features
 
-**Prerequisites:**  Node.js
+* ✅ Convert raw or unstructured resumes into ATS-friendly format
+* ✅ Clean and professional layout
+* ✅ Simple and intuitive UI
+* ✅ Fast processing
+* ✅ Ready for deployment
 
+---
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🛠 Tech Stack
+
+* TypeScript
+* Vite
+* CSS / Tailwind CSS (if used)
+* Node.js
+
+---
+
+## 🚀 Getting Started
+
+### 🔹 Prerequisites
+
+Make sure you have installed:
+
+* Node.js (v14 or higher recommended)
+* npm or yarn
+
+---
+
+### 📥 Clone the Repository
+
+```bash
+git clone https://github.com/githarsh108/Resume_Builder.git
+cd Resume_Builder
+```
+
+---
+
+### 📦 Install Dependencies
+
+```bash
+npm install
+```
+
+or
+
+```bash
+yarn
+```
+
+---
+
+### 🧪 Run the Project Locally
+
+```bash
+npm run dev
+```
+
+After running the command, open your browser and go to:
+
+```
+http://localhost:5173
+```
+
+---
+
+## 🏗 Build for Production
+
+To create an optimized production build:
+
+```bash
+npm run build
+```
+
+This will generate a `dist/` folder ready for deployment.
+
+---
+
+## 📂 Project Structure
+
+```
+src/                # Application source code
+public/             # Static assets
+index.html          # Main HTML file
+tsconfig.json       # TypeScript configuration
+vite.config.ts      # Vite configuration
+package.json        # Dependencies and scripts
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome.
+
+1. Fork the repository
+2. Create a new branch
+3. Commit your changes
+4. Push to your fork
+5. Open a Pull Request
+
+Please ensure your code is clean and well-documented.
+
+---
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+---
+
+## ⭐ Support
+
+If you found this project helpful, consider giving it a star on GitHub.
