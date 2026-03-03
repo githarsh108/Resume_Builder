@@ -38,7 +38,7 @@ export async function transformResumeWithAI(text: string, jobDescription?: strin
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.0-flash",
         contents: [{ parts: [{ text: prompt }] }],
         config: {
           responseMimeType: "application/json",
@@ -114,20 +114,27 @@ export async function transformResumeWithAI(text: string, jobDescription?: strin
       const status = e?.status || e?.code;
       const message = e?.message || "";
 
+      console.error(`AI Transformation attempt ${attempt + 1} failed:`, { status, message });
+
+      // Handle 404 specifically (Model not found)
+      if (status === 404 || status === 'NOT_FOUND') {
+        console.error("CRITICAL: The specified Gemini model was not found. Please check if the model name is correct and available in your project/region.");
+        break;
+      }
+
       // Retry on 429 (Resource Exhausted) or 503 (Unavailable)
       const isRetryable = status === 'RESOURCE_EXHAUSTED' || status === 429 || status === 'UNAVAILABLE' || status === 503 || message.includes('quota') || message.includes('429');
 
       if (isRetryable && attempt < maxRetries) {
-        const delay = Math.pow(2, attempt + 1) * 2000; // Increased delay for quota issues
+        const delay = Math.pow(2, attempt + 1) * 2000;
         console.warn(`AI Quota or Server error (${status}), retrying in ${delay}ms... (Attempt ${attempt + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
 
-      console.error("AI Transformation failed final attempt:", { status, message, attempt });
       break;
     }
   }
 
-  throw new Error(lastError?.message || "Failed to transform resume data after multiple attempts");
+  throw new Error(`AI Transformation failed: ${lastError?.message || "Unknown error"}`);
 }
