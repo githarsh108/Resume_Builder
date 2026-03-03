@@ -2,7 +2,13 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { ResumeData } from "../types/resume.types";
 
 export async function transformResumeWithAI(text: string, jobDescription?: string): Promise<ResumeData> {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+  const apiKey = process.env.GEMINI_API_KEY || "";
+
+  if (!apiKey) {
+    console.error("DEBUG: GEMINI_API_KEY is missing or undefined in the browser environment.");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
 
   const jobSection = jobDescription?.trim()
     ? `\n    JOB DESCRIPTION TO TARGET:\n    ${jobDescription.trim()}\n\n    TAILORING INSTRUCTIONS:\n    - Tailor the resume specifically for this job description.\n    - Rewrite experience and project bullets to mirror the job's language and keywords.\n    - Emphasize skills and tools mentioned in the job description.\n    - Do NOT fabricate experience — only reframe existing content.\n`
